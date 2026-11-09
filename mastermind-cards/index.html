@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}</style>
+<title>Out of the Bubble</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: card table. Facilitator panel left, one large poster card right. Cut-paper emblems in five suits. */
+:root {
+  --bg: #EFEFF2; --fg: #0F2438; --muted: #4A5F75; --line: #B9C3CE; --raised: #E3E3E9;
+  --paper: #FCFCFC; --ink: #0F2438; --ink-soft: #4A5F75; --paper-line: #DDE2E8;
+  --wplyw: #EF476F; --fach: #26547C; --maska: #FCFCFC; --paliwo: #FFD166; --droga: #06D6A0;
+  --on-suit: #FCFCFC; --on-bright: #0F2438;
+  --shadow: 0 2px 3px rgba(15,36,56,.18), 0 22px 44px -18px rgba(15,36,56,.5);
+  --display: "Bricolage Grotesque", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E2133; --fg: #FCFCFC; --muted: #A6B6C6; --line: #32506B; --raised: #1A3650;
+  --shadow: 0 2px 3px rgba(0,0,0,.4), 0 26px 50px -18px rgba(0,0,0,.85);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0E2133; --fg: #FCFCFC; --muted: #A6B6C6; --line: #32506B; --raised: #1A3650;
+  --shadow: 0 2px 3px rgba(0,0,0,.4), 0 26px 50px -18px rgba(0,0,0,.85);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font: 400 1rem/1.5 var(--body); }
+.page {
+  max-width: 1120px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 56px;
+  display: grid; gap: 32px;
+}
+h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+h1, h2, h3 { text-wrap: balance; font-family: var(--display); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--fach); outline-offset: 2px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) :focus-visible { outline-color: var(--paliwo); } }
+:root[data-theme="dark"] :focus-visible { outline-color: var(--paliwo); }
+
+.s-wplyw { --suit: var(--wplyw); --on: var(--on-bright); }
+.s-fach { --suit: var(--fach); --on: var(--on-suit); }
+.s-maska { --suit: var(--maska); --on: var(--on-bright); --now: var(--ink); --now-on: var(--paper); }
+.s-paliwo { --suit: var(--paliwo); --on: var(--on-bright); }
+.s-droga { --suit: var(--droga); --on: var(--on-bright); }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.mark { font: 500 .8rem/1.3 var(--body); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.tabs { display: flex; gap: 4px; }
+.tabs a {
+  color: var(--muted); text-decoration: none; font-weight: 500; font-size: .94rem;
+  padding: 6px 12px; border-radius: 5px;
+}
+.tabs a[aria-current="page"] { background: var(--fg); color: var(--bg); }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: clamp(28px, 6vw, 72px); align-items: start; }
+.panel { display: grid; gap: 26px; min-width: 0; padding-top: 10px; }
+.panel > div { display: grid; gap: 22px; }
+h1 { font-size: clamp(3.6rem, 9.5vw, 6.6rem); line-height: .9; font-weight: 800; font-stretch: 78%; letter-spacing: -.015em; }
+.lede { font-size: 1.16rem; line-height: 1.45; max-width: 34em; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn {
+  border: 1.5px solid var(--fg); background: transparent; border-radius: 6px;
+  padding: 10px 16px; font-weight: 600; line-height: 1.2;
+}
+.btn:hover:not(:disabled) { background: var(--raised); }
+.btn.primary { background: var(--fg); color: var(--bg); padding: 13px 22px; font-size: 1.06rem; }
+.btn.primary:hover:not(:disabled) { background: var(--fg); opacity: .86; }
+.btn:disabled { opacity: .42; cursor: not-allowed; }
+.btn.quiet { border-color: var(--line); font-weight: 500; }
+.count { color: var(--muted); font-size: .95rem; font-variant-numeric: tabular-nums; }
+.rules { display: grid; gap: 12px; border-top: 1.5px solid var(--line); padding-top: 20px; max-width: 36em; }
+.rules strong { font-weight: 600; }
+.rules li { color: var(--muted); }
+.rules strong { color: var(--fg); }
+
+/* Card */
+.slot { perspective: 1800px; min-width: 0; }
+.flip { display: grid; transform-style: preserve-3d; transition: transform .62s cubic-bezier(.3,.9,.3,1); }
+.flip.is-up { transform: rotateY(180deg); }
+.face { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 18px; overflow: hidden; min-width: 0; }
+.face.front { transform: rotateY(180deg); box-shadow: var(--shadow); }
+.face.back {
+  position: relative; border: 12px solid var(--paper); background: var(--ink); min-height: 640px; padding: 0;
+  box-shadow: var(--shadow); width: 100%; display: block;
+  transition: translate .2s ease;
+}
+.face.back:hover { translate: 0 -5px; }
+.pattern { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 15%; padding: 14px; gap: 6px; overflow: hidden; }
+.pattern svg { width: 100%; height: 100%; color: var(--suit); }
+.plate {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 72%;
+  background: var(--paper); color: var(--ink); border-radius: 8px; padding: 20px 16px; display: grid; gap: 6px; justify-items: center; text-align: center;
+}
+.plate b { font: 800 clamp(2rem, 6vw, 2.8rem)/.95 var(--display); font-stretch: 78%; }
+.plate span { font-size: .92rem; color: var(--ink-soft); }
+
+.card { background: var(--paper); color: var(--ink); display: flex; flex-direction: column; height: 100%; }
+.card header { position: relative; background: var(--suit); color: var(--on); padding: 20px 24px 22px; overflow: hidden; display: grid; gap: 34px; }
+.card header svg { position: absolute; right: -32px; top: -26px; width: 210px; height: 210px; opacity: .24; }
+.tag { position: relative; display: flex; justify-content: space-between; gap: 12px; font: 500 .84rem/1.3 var(--body); letter-spacing: .05em; text-transform: uppercase; }
+.card h2 { position: relative; font-size: clamp(2.3rem, 7vw, 3.3rem); line-height: .96; font-weight: 800; font-stretch: 80%; }
+.card .inner { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+.task { font-size: 1.2rem; line-height: 1.38; font-weight: 500; }
+.steps { display: grid; gap: 0; border-top: 1.5px solid var(--paper-line); }
+.steps li { display: grid; grid-template-columns: 3.1em minmax(0,1fr); gap: 8px; padding: 9px 8px; border-bottom: 1.5px solid var(--paper-line); line-height: 1.32; }
+.steps .min { font: 500 .96rem/1.4 var(--mono); color: var(--ink-soft); }
+.steps li.is-now { background: var(--now, var(--suit)); color: var(--now-on, var(--on)); }
+.s-maska header { box-shadow: inset 0 -1.5px 0 var(--paper-line); }
+.steps li.is-now .min { color: inherit; }
+.exit { margin-top: auto; display: grid; gap: 3px; }
+.exit small { font-size: .78rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-soft); }
+.exit p { font: 700 1.3rem/1.16 var(--display); font-stretch: 88%; }
+
+/* Clock */
+.eyebrow { font: 500 .84rem/1.3 var(--body); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.clock { font: 500 clamp(4.4rem, 11vw, 7.4rem)/.95 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.phase { font-size: 1.16rem; line-height: 1.38; min-height: 3.2em; max-width: 30em; }
+.bar { display: flex; gap: 4px; height: 12px; }
+.bar i { display: block; position: relative; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar b { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--fg); }
+.total { color: var(--muted); font-size: .95rem; font-variant-numeric: tabular-nums; }
+.note { color: var(--muted); font-size: .94rem; }
+
+/* Full deck */
+.deck-head { display: grid; gap: 8px; max-width: 42em; }
+.deck-head h1 { font-size: clamp(2.8rem, 7vw, 4.4rem); }
+.group { display: grid; gap: 14px; }
+.group > h2 { font-size: 1.7rem; font-weight: 700; font-stretch: 84%; display: flex; align-items: center; gap: 10px; }
+.group > h2 span { display: inline-block; width: 18px; height: 18px; border-radius: 3px; background: var(--suit); box-shadow: 0 0 0 1px var(--line); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.entry { display: grid; grid-template-rows: 1fr auto; border-radius: 12px; overflow: hidden; background: var(--paper); box-shadow: 0 1px 2px rgba(15,36,56,.2); }
+.entry .card header { padding: 14px 18px 16px; gap: 16px; }
+.entry .card header svg { width: 120px; height: 120px; right: -18px; top: -14px; }
+.entry .card h2 { font-size: 1.8rem; }
+.entry .card .inner { padding: 16px 18px; gap: 14px; }
+.entry .task { font-size: 1.02rem; }
+.entry .steps li { padding: 6px 2px; font-size: .92rem; }
+.entry .exit p { font-size: 1.08rem; }
+.entry .tools { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 18px 14px; color: var(--ink); }
+.entry .tools .btn { border-color: var(--ink); padding: 7px 11px; font-size: .9rem; color: var(--ink); }
+.entry .tools .btn:hover { background: var(--paper-line); }
+.entry .played { font-size: .86rem; font-weight: 600; color: var(--ink-soft); }
+.entry.is-played .card { opacity: .55; }
+
+@media (max-width: 860px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .stage.is-playing .slot { order: -1; }
+  .face.back { min-height: 500px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip, .face.back { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav class="topbar" aria-label="Views">
+    <span class="mark">Mastermind for Product Leads</span>
+    <div class="tabs">
+      <a href="#table" id="tabStol">Table</a>
+      <a href="#deck" id="tabTalia">Full deck</a>
+    </div>
+  </nav>
+
+  <main id="viewStol" style="display:grid;gap:40px">
+    <section class="stage" id="stage">
+      <div class="panel">
+        <div id="idle">
+          <h1>Out of the bubble</h1>
+          <p class="lede">One person draws a card and becomes its subject. For 15 minutes we talk about them as a senior in the profession, and current problems wait for the hot seat.</p>
+          <div class="actions">
+            <button class="btn primary" id="draw" type="button">Draw a card</button>
+            <button class="btn quiet" id="reset" type="button">Reshuffle</button>
+          </div>
+          <p class="count" id="count" aria-live="polite"></p>
+          <ul class="rules">
+            <li><strong>Someone without a hot seat today draws.</strong> The card is for them, and someone else keeps time.</li>
+            <li><strong>The person drawing has one veto.</strong> No reason needed. The card goes back in the deck.</li>
+            <li><strong>We talk about the person, not the company.</strong> Anyone who drifts back to a current problem hears: “save it for the hot seat”.</li>
+            <li><strong>We close with the question at the bottom of the card.</strong> The answer can become a commitment. What’s said here stays in the group.</li>
+          </ul>
+        </div>
+
+        <div id="play" hidden>
+          <p class="eyebrow" id="playSuit"></p>
+          <div class="clock" id="clock" role="timer">00:00</div>
+          <p class="phase" id="phase" aria-live="polite"></p>
+          <div class="bar" id="bar" aria-hidden="true"></div>
+          <p class="total" id="total"></p>
+          <div class="actions">
+            <button class="btn primary" id="toggle" type="button">Start</button>
+            <button class="btn" id="next" type="button">Next step</button>
+            <button class="btn" id="clockReset" type="button">Reset timer</button>
+          </div>
+          <div class="actions">
+            <button class="btn quiet" id="veto" type="button">Veto: draw another</button>
+            <button class="btn quiet" id="done" type="button">Put card away</button>
+          </div>
+          <p class="note" id="vetoNote"></p>
+        </div>
+      </div>
+
+      <div class="slot">
+        <div class="flip" id="flip">
+          <button class="face back" id="back" type="button" aria-label="Draw a card">
+            <span class="pattern" id="pattern" aria-hidden="true"></span>
+            <span class="plate"><b>Out of the bubble</b><span id="plateCount"></span></span>
+          </button>
+          <div class="face front" id="front" inert></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main id="viewTalia" hidden style="gap:32px">
+    <div class="deck-head">
+      <h1>Full deck</h1>
+      <p class="note">This view reveals every card, so don’t share it during a meeting. From here you can put a chosen card on the table or return a played one to the deck.</p>
+    </div>
+    <div id="groups" style="display:grid;gap:36px"></div>
+  </main>
+</div>
+
+<script>
+const EMBLEMS = {
+  droga:  '<path d="M42 92V58L14 24l12-10 24 29 24-29 12 10-28 34v34z"/>',
+  fach:   '<path fill-rule="evenodd" d="M10 90V10l80 80zM26 74h26L26 48z"/>',
+  wplyw:  '<circle cx="50" cy="50" r="11"/><path fill-rule="evenodd" d="M50 6a44 44 0 1 0 0 88 44 44 0 0 0 0-88zm0 13a31 31 0 1 1 0 62 31 31 0 0 1 0-62z"/>',
+  maska:  '<path d="M48 6a44 44 0 0 0 0 88z"/><path opacity=".6" d="M52 6a44 44 0 0 1 0 88z"/>',
+  paliwo: '<path fill-rule="evenodd" d="M6 28h78v13h10v18H84v13H6zM17 39v22h16V39zm22 0v22h16V39z"/>'
+};
+const svg = k => `<svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">${EMBLEMS[k]}</svg>`;
+
+const SUITS = [
+  { id:'droga',  name:'Path' },
+  { id:'fach',   name:'Craft' },
+  { id:'wplyw',  name:'Influence' },
+  { id:'maska',  name:'Unmasked' },
+  { id:'paliwo', name:'Fuel' }
+];
+const suitOf = id => SUITS.find(s => s.id === id);
+
+const C = (id, suit, title, task, steps, exit) => ({ id, suit, title, task, steps, exit });
+const CARDS = [
+  C('droga1','droga','The job you don’t want','Name the role that is the natural next step on your path, but one you have doubts about. Why do you still work as if it were your goal?',
+    [[2,'You write down the role and one doubt'],[4,'You explain where this goal came from'],[7,'The group asks: whose idea was this, and what happens if you let it go'],[2,'You say what this conversation changes']],
+    'What will you stop doing if this isn’t your goal?'),
+  C('droga2','droga','Manager or expert','Choose your path for the next five years: people reporting to you, or the expert track to Principal. There is no middle option. You have 60 seconds to decide.',
+    [[1,'You choose and say it out loud'],[3,'You justify your choice'],[8,'The group defends the other path and shows what you lose'],[3,'You say whether your choice held up']],
+    'What step this quarter will confirm this choice?'),
+  C('droga3','droga','One line on your CV','Five years have passed. Write one CV line about your biggest achievement of that period: what, where, and with what result.',
+    [[2,'You write the line'],[3,'You read it and say why this one'],[7,'The group checks whether your current calendar leads there'],[3,'You pick one thing to change']],
+    'What this quarter moves you closer to that line?'),
+  C('droga4','droga','A world without product managers','As of tomorrow, product management no longer exists as a profession. You keep your skills and your network. What will someone pay you for next month?',
+    [[3,'You write down three offers for the market'],[3,'You present them to the group'],[7,'The group says which one they’d buy and for how much'],[2,'You point to the offer that surprised you']],
+    'Which of these skills are you underinvesting in today?'),
+  C('droga5','droga','Too comfortable','What in your work now runs on autopilot? Count the months since a task last truly stretched you beyond what you could do.',
+    [[2,'You count the months and pick an example'],[4,'You describe what now comes without effort'],[6,'The group proposes tasks that could stretch you'],[3,'You pick one of them']],
+    'What hard task will you take on before the next meeting?'),
+
+  C('fach1','fach','You hire me when…','Finish the sentence: “You hire me when you need…”. The group writes its own version about you before hearing yours.',
+    [[3,'Everyone writes, without posting yet'],[2,'The group posts in the chat, you read yours'],[7,'We talk about the differences'],[3,'You revise your sentence']],
+    'Do your LinkedIn and your actual work say the same thing today?'),
+  C('fach2','fach','The rusty skill','Pick a skill from your CV you haven’t used in a year: discovery, SQL, pricing, customer interviews. Rate it honestly from 1 to 5.',
+    [[2,'You pick it and rate it'],[4,'You explain what pushed it out'],[6,'The group designs a two-hour test of your rating'],[3,'You choose the test']],
+    'When in the next two weeks will you take this test?'),
+  C('fach3','fach','What’s left after AI','List your tasks from last week. Mark what an AI agent could already do just as well. Look at what remains.',
+    [[4,'You list and mark'],[3,'You read out what remains'],[6,'The group asks whether that’s enough for a senior level'],[2,'You name your edge in one sentence']],
+    'Which of the remaining skills is worth strengthening now?'),
+  C('fach4','fach','The habit that got you promoted','Name the habit you owe your seniority to. Show where it has started to limit you.',
+    [[2,'You name the habit'],[4,'You give one situation where it helped and one where it hurt'],[6,'The group says where it sees this habit in you at our meetings'],[3,'You say what could replace it']],
+    'In what situation will you try doing the opposite?'),
+  C('fach5','fach','No frameworks','A junior asks: “How do you know it’s a good product decision?” Answer in two sentences, with no framework names and no “it depends”.',
+    [[3,'You write two sentences'],[2,'You read them to the group'],[7,'The group plays the junior and asks “why?” three times'],[3,'You revise your two sentences']],
+    'What in your judgment can you still not explain?'),
+
+  C('wplyw1','wplyw','The person you can’t convince','Pick someone at work you regularly lose arguments to. For a while you play them, and the group tries to convince you. We leave the current dispute aside and look for the pattern.',
+    [[2,'You describe this person in three sentences'],[6,'You play them, the group tries to convince you'],[4,'You say what worked on you as this person'],[3,'The group names the pattern in your approach']],
+    'Which argument will you stop using with this person?'),
+  C('wplyw2','wplyw','When you’re not in the room','What gets said about you in a meeting you’re not in? Write the version you want and the version you fear.',
+    [[3,'You write both versions'],[2,'You read them to the group'],[7,'The group says which version it hears in your stories'],[3,'You pick one behavior to change']],
+    'Who at work can you ask which version is true?'),
+  C('wplyw3','wplyw','Who shows up without the title','Your title and your place in the org chart disappear. Nobody has to listen to you. Who still comes to your meeting, and why?',
+    [[3,'You write down names and reasons'],[3,'You talk through the list'],[6,'The group asks how you know and who’s missing'],[3,'You point to one missing person']],
+    'What will you do for the person missing from this list?'),
+  C('wplyw4','wplyw','The trust account','Summarize last quarter like a bank statement: where trust came in, where it went out, and what’s left. Give specific situations.',
+    [[3,'You list deposits and withdrawals'],[4,'You read out the statement'],[5,'The group asks about the biggest withdrawal: was it worth it'],[3,'You decide what to spend the balance on']],
+    'What cause is worth spending what’s left on?'),
+  C('wplyw5','wplyw','The sentence that’s waiting','You have an opinion about your product or company that hasn’t been voiced in any meeting for months. Say it here, in a full sentence.',
+    [[2,'You put the sentence together'],[3,'You say it and explain what’s behind it'],[7,'The group asks what’s holding you back and what the worst possible reaction is'],[3,'You draft the version to say at work']],
+    'Who will you say this to, and when?'),
+
+  C('maska1','maska','Pretending to understand','Finish the sentence: “I pretend to understand…”. Finance, architecture, law, AI, anything. If someone in the group understands it, they explain it to you in 60 seconds.',
+    [[1,'You finish the sentence'],[3,'You say how long this has gone on and how you cope'],[8,'The group explains and adds its own examples of pretending'],[3,'You choose who you’ll learn from']],
+    'Who at work will you ask for an hour so you can stop pretending?'),
+  C('maska2','maska','Professional envy','Who do you envy professionally? Name the person and exactly what you envy. No “in a good way”.',
+    [[2,'You pick the person'],[4,'You describe what exactly bothers you'],[6,'The group asks what this says about what you want'],[3,'You name the desire behind the envy']],
+    'What part of this do you actually need?'),
+  C('maska3','maska','Success by accident','Pick a result you get credit for that was largely down to luck, timing, or other people’s work. Say it out loud.',
+    [[2,'You pick the result'],[5,'You break it down: mine, chance, others'],[5,'The group looks for what really was yours'],[3,'You separate what’s repeatable from luck']],
+    'Who deserves a share of this credit, and do they know it?'),
+  C('maska4','maska','A review from your tech lead','Write three sentences about working with you, from the perspective of the tech lead or designer you work with most closely. No malice, full knowledge.',
+    [[3,'You write the review'],[2,'You read it to the group'],[7,'The group asks about specific situations'],[3,'You judge how much of it is true']],
+    'What will you ask this person directly before the next meeting?'),
+  C('maska5','maska','Introduce yourself without work','You have 60 seconds to introduce yourself. You can’t use your company name, job title, industry, or the word “product”.',
+    [[2,'You prepare'],[1,'You speak'],[9,'The group says what it heard and asks about what was missing'],[3,'You say what was hardest']],
+    'What outside work did you run out of time for this year?'),
+
+  C('paliwo1','paliwo','Energy balance','List three things from the last two weeks that gave you energy and three that took it away. Tasks, people, situations.',
+    [[3,'You write both lists'],[3,'You read them to the group'],[6,'The group looks for a pattern you can’t see'],[3,'You say which of this is in your hands']],
+    'What one thing will you cut back on in the next two weeks?'),
+  C('paliwo2','paliwo','Why are you doing this?','Answer why you still do this job. Banned words: “impact”, “customers”, “growth”, “money”.',
+    [[2,'You look for an answer'],[3,'You answer the group'],[7,'The group keeps asking “and why does that matter to you?” until you hit bottom'],[3,'You write down what’s left']],
+    'How much of this does your current role give you?'),
+  C('paliwo4','paliwo','The four-day week','For one quarter you work four days a week. Your pay and expected results stay the same. What do you stop doing?',
+    [[3,'You write your list'],[3,'You read it to the group'],[6,'The group adds what else could go'],[3,'You mark what you can stop right now']],
+    'What will you drop next week without asking permission?'),
+  C('paliwo5','paliwo','The reason you leave','Imagine you leave your company in six months. Write one sentence with the real reason. Before you read it, the group guesses.',
+    [[2,'You write the sentence'],[3,'The group posts its guesses in the chat'],[7,'You read your sentence, we talk about the difference'],[3,'You say what can be done about this reason today']],
+    'What would have to happen for this reason to go away?')
+];
+
+const $ = id => document.getElementById(id);
+const KEY = 'poza-banka-zagrane';
+const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
+const write = v => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} };
+
+const state = { played: new Set(read()), card: null, vetoUsed: false, step: 0, left: 0, running: false, started: false, finished: false, last: 0 };
+let audio = null, flipTimer = null, resetTimer = null;
+
+const pool = () => CARDS.filter(c => !state.played.has(c.id));
+const fmt = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+const kart = n => n === 1 ? 'card' : 'cards';
+
+function cardHTML(c) {
+  const s = suitOf(c.suit);
+  return `<article class="card s-${c.suit}">
+    <header>${svg(c.suit)}<div class="tag"><span>${s.name}</span><span>15 min</span></div><h2>${c.title}</h2></header>
+    <div class="inner">
+      <p class="task">${c.task}</p>
+      <ol class="steps">${c.steps.map(([m, t]) => `<li><span class="min">${m} min</span><span>${t}</span></li>`).join('')}</ol>
+      <div class="exit"><small>To close, in one sentence</small><p>${c.exit}</p></div>
+    </div>
+  </article>`;
+}
+
+function renderCounts() {
+  const n = pool().length, all = CARDS.length;
+  $('count').textContent = n ? `In the deck: ${n} of ${all}. Played cards stay out until the end of the season.` : 'The deck is empty. Reshuffle it to start the next season.';
+  $('plateCount').textContent = n ? `${n} ${kart(n)} · click to draw` : 'The deck is empty';
+  $('draw').disabled = !n;
+  $('back').disabled = !n;
+}
+
+function renderGroups() {
+  $('groups').innerHTML = SUITS.map(s => `<section class="group s-${s.id}">
+    <h2><span></span>${s.name}</h2>
+    <div class="grid">${CARDS.filter(c => c.suit === s.id).map(c => {
+      const p = state.played.has(c.id);
+      return `<div class="entry ${p ? 'is-played' : ''}">${cardHTML(c)}<div class="tools">
+        <span class="played">${p ? 'Played' : ''}</span>
+        <button class="btn" type="button" data-act="${p ? 'restore' : 'table'}" data-id="${c.id}">${p ? 'Return to deck' : 'Put on the table'}</button>
+      </div></div>`;
+    }).join('')}</div>
+  </section>`).join('');
+}
+
+function setTimerFor(card) {
+  state.step = 0; state.left = card.steps[0][0] * 60000;
+  state.running = false; state.started = false; state.finished = false;
+  $('bar').innerHTML = card.steps.map(([m]) => `<i style="flex:${m}"><b></b></i>`).join('');
+}
+
+function renderPlay() {
+  const c = state.card;
+  if (!c) return;
+  const steps = c.steps;
+  $('playSuit').textContent = `${suitOf(c.suit).name} · ${c.title}`;
+  $('clock').textContent = fmt(state.finished ? 0 : state.left);
+  $('phase').textContent = state.finished
+    ? 'Time’s up. The person who drew answers the question at the bottom of the card in one sentence.'
+    : `Step ${state.step + 1} of ${steps.length}: ${steps[state.step][1]}`;
+  const later = steps.slice(state.step + 1).reduce((a, [m]) => a + m * 60000, 0);
+  $('total').textContent = state.finished ? '' : `Left on this card: ${fmt(state.left + later)}`;
+  [...$('bar').children].forEach((el, i) => {
+    const total = steps[i][0] * 60000;
+    const done = state.finished || i < state.step ? 1 : i > state.step ? 0 : 1 - state.left / total;
+    el.firstChild.style.width = (done * 100) + '%';
+  });
+  document.querySelectorAll('#front .steps li').forEach((li, i) => li.classList.toggle('is-now', state.started && !state.finished && i === state.step));
+  $('toggle').textContent = state.running ? 'Pause' : state.started ? 'Resume' : 'Start';
+  $('toggle').disabled = state.finished;
+  $('next').disabled = state.finished || !state.started;
+  $('clockReset').disabled = !state.started;
+  $('veto').disabled = state.vetoUsed || state.started || pool().filter(x => x.id !== c.id).length === 0;
+  $('vetoNote').textContent = state.vetoUsed ? '' : 'You can use the veto once, before the timer starts, with no reason needed.';
+}
+
+function showCard(card) {
+  clearTimeout(flipTimer);
+  state.card = card;
+  setTimerFor(card);
+  $('front').innerHTML = cardHTML(card);
+  $('idle').hidden = true; $('play').hidden = false;
+  $('stage').classList.add('is-playing');
+  $('flip').classList.add('is-up');
+  $('front').inert = false; $('back').inert = true;
+  renderPlay();
+}
+
+function draw(exclude) {
+  const options = pool().filter(c => c.id !== exclude);
+  if (!options.length) { renderCounts(); return; }
+  showCard(options[Math.floor(Math.random() * options.length)]);
+}
+
+function toIdle() {
+  state.card = null; state.running = false; state.started = false; state.finished = false;
+  $('flip').classList.remove('is-up');
+  $('front').inert = true; $('back').inert = false;
+  $('idle').hidden = false; $('play').hidden = true;
+  $('stage').classList.remove('is-playing');
+  renderCounts();
+}
+
+function beep() {
+  if (!audio) return;
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.frequency.value = 660;
+  g.gain.setValueAtTime(.0001, audio.currentTime);
+  g.gain.exponentialRampToValueAtTime(.18, audio.currentTime + .03);
+  g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + .55);
+  o.connect(g).connect(audio.destination);
+  o.start(); o.stop(audio.currentTime + .6);
+}
+
+function advance() {
+  const c = state.card;
+  if (state.step < c.steps.length - 1) {
+    state.step++; state.left = c.steps[state.step][0] * 60000;
+  } else {
+    state.finished = true; state.running = false; state.left = 0;
+  }
+  beep();
+}
+
+setInterval(() => {
+  if (!state.running || !state.card) return;
+  const now = Date.now();
+  state.left -= now - state.last;
+  state.last = now;
+  if (state.left <= 0) advance();
+  renderPlay();
+}, 200);
+
+$('draw').addEventListener('click', () => draw());
+$('back').addEventListener('click', () => draw());
+
+$('toggle').addEventListener('click', () => {
+  if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch {} }
+  state.started = true;
+  state.running = !state.running;
+  state.last = Date.now();
+  renderPlay();
+});
+$('clockReset').addEventListener('click', () => { if (state.card) { setTimerFor(state.card); renderPlay(); } });
+$('next').addEventListener('click', () => { state.last = Date.now(); advance(); renderPlay(); });
+
+$('veto').addEventListener('click', () => {
+  if (state.vetoUsed || !state.card) return;
+  const rejected = state.card.id;
+  state.vetoUsed = true;
+  $('flip').classList.remove('is-up');
+  $('veto').disabled = true;
+  flipTimer = setTimeout(() => draw(rejected), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 520);
+});
+
+$('done').addEventListener('click', () => {
+  state.played.add(state.card.id);
+  write([...state.played]);
+  state.vetoUsed = false;
+  toIdle();
+  renderGroups();
+});
+
+$('reset').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!b.dataset.armed) {
+    b.dataset.armed = '1'; b.textContent = 'Click again to reshuffle';
+    resetTimer = setTimeout(() => { delete b.dataset.armed; b.textContent = 'Reshuffle'; }, 4000);
+    return;
+  }
+  clearTimeout(resetTimer);
+  delete b.dataset.armed; b.textContent = 'Reshuffle';
+  state.played.clear(); state.vetoUsed = false; write([]);
+  renderCounts(); renderGroups();
+});
+
+$('groups').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  if (b.dataset.act === 'restore') {
+    state.played.delete(b.dataset.id); write([...state.played]);
+    renderCounts(); renderGroups();
+  } else {
+    showCard(CARDS.find(c => c.id === b.dataset.id));
+    location.hash = 'table';
+  }
+});
+
+function route() {
+  const talia = location.hash === '#deck';
+  $('viewStol').hidden = talia;
+  $('viewTalia').hidden = !talia;
+  $('viewTalia').style.display = talia ? 'grid' : '';
+  if (talia) $('tabTalia').setAttribute('aria-current', 'page'); else $('tabTalia').removeAttribute('aria-current');
+  if (!talia) $('tabStol').setAttribute('aria-current', 'page'); else $('tabStol').removeAttribute('aria-current');
+}
+addEventListener('hashchange', route);
+
+$('pattern').innerHTML = Array.from({ length: 48 }, (_, i) => {
+  const s = SUITS[(i + Math.floor(i / 6) * 2) % 5];
+  return `<span class="s-${s.id}">${svg(s.id)}</span>`;
+}).join('');
+
+renderCounts();
+renderGroups();
+route();
+</script>
+
+</body>
+</html>
